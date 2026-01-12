@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Intent Mapping: Tools vs. Python | Lumina</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Basic Styles (Same as home page) */
+        :root {
+            --primary: #2563eb; --secondary: #0f172a; --text-main: #334155;
+            --bg-body: #f8fafc; --bg-card: #ffffff; --border: #e2e8f0;
+            --font-sans: 'Inter', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-sans); background: var(--bg-body); color: var(--text-main); line-height: 1.7; }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 20px 0; }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--secondary); }
+        .logo span { color: var(--primary); }
+        
+        .article { background: var(--bg-card); padding: 60px 0; min-height: 80vh; }
+        .tag { background: #e0f2fe; color: var(--primary); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; text-transform: uppercase; }
+        h1 { font-size: 2.5rem; color: var(--secondary); margin: 15px 0; line-height: 1.2; }
+        .meta { color: #64748b; font-size: 0.9rem; margin-bottom: 30px; }
+        p { margin-bottom: 20px; font-size: 1.1rem; color: #334155; }
+        h2 { color: var(--secondary); margin-top: 50px; margin-bottom: 20px; font-size: 1.8rem; }
+        
+        /* Simple list styling for the Pros/Cons section */
+        ul { list-style: disc; padding-left: 20px; margin-bottom: 20px; color: #334155; }
+        li { margin-bottom: 10px; font-size: 1.05rem; }
+        
+        /* Inline style for a simple highlight box */
+        .highlight-box {
+            background: #f1f5f9; 
+            border-left: 4px solid var(--primary); 
+            padding: 20px; 
+            margin: 30px 0; 
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <!-- FIXED LINK: Points to indext.html -->
+            <a href="indext.html" class="logo">Lumina<span>.</span></a>
+        </div>
+    </header>
+
+    <article class="article">
+        <div class="container">
+            <span class="tag">SEO & Automation</span>
+            <h1>SEO Intent Mapping: Off-the-Shelf Tools vs. Custom Python Solutions</h1>
+            <div class="meta">By SEO Insights Team • Nov 10, 2025 • 15 min read</div>
+            
+            <img src="https://picsum.photos/seed/seo/800/400" alt="SEO Code Analysis" style="width:100%; border-radius: 12px; margin-bottom: 30px;">
+
+            <p><strong>SEO intent mapping</strong> involves grouping keywords or search queries by the underlying user intent (e.g. informational, navigational, transactional) and aligning them with appropriate content. In practice, this means analyzing keyword lists and SERPs to decide which topics or pages each keyword cluster should target.</p>
+            
+            <p>Search intent is simply the motivation behind a query – e.g. “buy running shoes” (transactional) vs “best running shoes for flat feet” (informational). Intent mapping helps SEO teams ensure that each piece of content matches what users expect, improving relevance and reducing redundant pages.</p>
+
+            <h2>Key Use Cases</h2>
+            <ul>
+                <li><strong>Content strategy:</strong> By clustering keywords, you can plan topical content hubs or silo structures. For example, grouping all “printer” related queries (buy printer, best printer 2025) on one product page avoids internal competition.</li>
+                <li><strong>Keyword clustering & site architecture:</strong> If two keywords share many top-ranking URLs, Google treats their intent as the same – hence one page should serve both. Clustering prevents cannibalization.</li>
+                <li><strong>Programmatic SEO:</strong> For sites generating pages at scale (e.g. local landing pages), Python scripts can loop through city lists to create unique pages with consistent structure.</li>
+                <li><strong>E‑commerce and Lead Gen:</strong> Online retailers use intent clusters to sort products into categories and guide on-site search.</li>
+            </ul>
+
+            <h2>Leading SEO Automation Tools</h2>
+            <p>Several SaaS platforms offer content and intent mapping features. The most popular include <strong>Clearscope, MarketMuse, Surfer SEO, and Frase</strong>. These tools blend keyword research, content optimization, and competitive analysis into an interface.</p>
+
+            <div class="highlight-box">
+                <h3 style="margin-top:0; font-size:1.2rem; color:var(--secondary);">Clearscope</h3>
+                <p style="font-size:1rem; margin-bottom:0;">Focused on content writing. Provides a live content editor with a “content grade” and keyword suggestions. It also offers topic maps and competitor comparison so you can see gaps versus top-ranking pages.</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3 style="margin-top:0; font-size:1.2rem; color:var(--secondary);">Surfer SEO</h3>
+                <p style="font-size:1rem; margin-bottom:0;">Combines keyword research with on-page optimization. It crawls SERPs to give data-driven recommendations. Its Content Editor shows keyword density and headings compared to top competitors.</p>
+            </div>
+
+            <div class="highlight-box">
+                <h3 style="margin-top:0; font-size:1.2rem; color:var(--secondary);">MarketMuse</h3>
+                <p style="font-size:1rem; margin-bottom:0;">A full-stack AI content-planning platform. It automatically crawls your site to build a content inventory, then uses machine learning to create topic models.</p>
+            </div>
+
+            <h2>Pros & Cons: Tools vs. Python</h2>
+            <p>Choosing between a SaaS platform and a custom Python build depends on your budget and technical resources.</p>
+
+            <h3 style="font-size: 1.4rem; margin-top: 30px; color: var(--secondary);">Prebuilt Tools</h3>
+            <ul>
+                <li><strong>Pros:</strong> Turnkey solution (no coding), rich data from proprietary algorithms, professional support, and integrations (Google Docs, WordPress).</li>
+                <li><strong>Cons:</strong> High subscription fees ($100-$400/mo), vendor lock-in, fixed scope, and limits on data based on plan credits.</li>
+            </ul>
+
+            <h3 style="font-size: 1.4rem; margin-top: 30px; color: var(--secondary);">Custom Python</h3>
+            <ul>
+                <li><strong>Pros:</strong> Complete flexibility and control, cost-efficient at scale (no per-query fees), deep customization (integrate your own data), and internal system integration.</li>
+                <li><strong>Cons:</strong> Requires significant development resources, time investment to build, ongoing maintenance (API changes), and lack of a polished UI.</li>
+            </ul>
+
+            <h2>DIY Frameworks and Libraries</h2>
+            <p>If choosing the custom route, here are common libraries used in SEO intent mapping:</p>
+            <ul>
+                <li><strong>NLP:</strong> spaCy (vectors, similarity), NLTK (stemming), Gensim (topic modeling).</li>
+                <li><strong>ML:</strong> scikit-learn (TF-IDF, KMeans, DBSCAN), KeyBERT.</li>
+                <li><strong>AI:</strong> OpenAI GPT-4 API to classify intent via prompts.</li>
+                <li><strong>Data:</strong> pandas (data manipulation), SERP APIs (Zenserp, SerpAPI).</li>
+            </ul>
+
+            <h2>Conclusion</h2>
+            <p>Use Off-the-Shelf Tools if you need a quick, polished solution and have budget. Use Custom Python if you have specific needs, manage very large sites, or require integration with internal data infrastructure. As a practical rule: <strong>Tools for speed, code for flexibility.</strong></p>
+            
+            <div style="margin-top: 50px;">
+                <!-- FIXED LINK: Points to indext.html -->
+                <a href="indext.html" style="color: var(--primary); font-weight: 600;">&larr; Back to Home</a>
+            </div>
+        </div>
+    </article>
+
+</body>
+</html>

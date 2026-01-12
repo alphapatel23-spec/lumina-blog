@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyword Intent Analyzer | Lumina</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb; --primary-dark: #1d4ed8;
+            --secondary: #0f172a; --text-main: #334155; --text-light: #64748b;
+            --bg-body: #f8fafc; --bg-card: #ffffff; --border: #e2e8f0;
+            --font-sans: 'Inter', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-sans); background: var(--bg-body); color: var(--text-main); line-height: 1.6; }
+        a { text-decoration: none; color: inherit; transition: 0.2s; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 20px 0; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--secondary); }
+        .logo span { color: var(--primary); }
+
+        .tool-wrapper { padding: 40px 0; }
+        .page-title { font-size: 2rem; color: var(--secondary); margin-bottom: 10px; text-align: center; }
+        .sub-text { text-align: center; margin-bottom: 30px; color: var(--text-light); }
+
+        .input-card {
+            background: var(--bg-card); padding: 30px; border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 40px;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        label { font-weight: 600; color: var(--secondary); font-size: 0.9rem; }
+        
+        input, textarea {
+            width: 100%; padding: 12px; border: 1px solid var(--border);
+            border-radius: 8px; font-family: inherit; font-size: 1rem;
+        }
+        input:focus, textarea:focus { outline: 2px solid var(--primary); border-color: transparent; }
+        
+        .button-group {
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            align-items: flex-start;
+        }
+        @media(min-width: 600px) {
+            .button-group { flex-direction: row; align-items: center; }
+        }
+
+        .btn {
+            background-color: var(--primary); color: white; padding: 12px 24px;
+            border-radius: 6px; font-weight: 600; border: none; cursor: pointer;
+            font-size: 1rem; transition: background 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn:disabled { background-color: #94a3b8; cursor: not-allowed; }
+        .btn:hover:not(:disabled) { background-color: var(--primary-dark); }
+        
+        .btn-green { background-color: #10b981; } 
+        .btn-green:hover { background-color: #059669; }
+
+        .results-area { display: none; }
+        .results-area.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px;}
+        th, td { padding: 15px; text-align: left; vertical-align: top; }
+        
+        /* Default Row Styling */
+        tr.data-row { border-bottom: 1px solid var(--border); }
+        tr:last-child.data-row { border-bottom: none; } /* Don't border the last main row before spacer */
+
+        th { background: #f1f5f9; color: var(--secondary); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; padding: 15px; }
+        
+        /* THE CELL GAP ROW */
+        tr.row-spacer td {
+            height: 30px; /* Size of the vertical gap */
+            background-color: var(--bg-card); /* Match table background */
+            border-bottom: none; /* No line in the middle of gap */
+            padding: 0;
+            color: transparent; /* Hide potential content */
+        }
+        
+        .badge-info { background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .badge-trans { background: #dcfce7; color: #16a34a; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .badge-generic { background: #f3f4f6; color: #4b5563; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .badge-mixed { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+
+        .google-link { color: var(--primary); font-weight: 600; text-decoration: underline; }
+        .google-link:hover { color: var(--primary-dark); }
+
+        /* Vertical Sequence Styles */
+        .titles-list { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0; 
+        }
+        .titles-list li { 
+            display: block; /* Vertical Stacking */
+            border-bottom: 1px solid #f1f5f9; /* Light divider between titles */
+            padding: 6px 0; 
+            color: #475569; 
+            font-size: 0.9rem;
+        }
+        .titles-list li:last-child { 
+            border-bottom: none; 
+        }
+        .titles-list li span {
+            color: #94a3b8; /* Number color */
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .loader {
+            display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite;
+            margin-left: 10px; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container nav-container">
+            <a href="indext.html" class="logo">Lumina<span>.</span></a>
+            <div style="font-size: 0.9rem; color: var(--text-light);">Keyword Intent Analyzer</div>
+        </div>
+    </header>
+
+    <main class="container tool-wrapper">
+        
+        <h1 class="page-title">Keyword Intent Analyzer</h1>
+        <p class="sub-text">Updated Logic: 60% Dominance Threshold & Vertical Title Gaps.</p>
+
+        <div class="input-card">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                <div>
+                    <label for="apiKey">Serper API Key:</label>
+                    <input type="password" id="apiKey" placeholder="Enter your API key" value="">
+                </div>
+                
+                <div>
+                    <label for="keywordInput">Enter Keywords:</label>
+                    <textarea id="keywordInput" rows="4" placeholder="Example:&#10;tooth decay&#10;buy protein&#10;seo services"></textarea>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn" id="analyzeBtn" onclick="runAnalysis()">
+                    <span id="btnText">Analyze Keywords</span>
+                </button>
+                
+                <button class="btn btn-green" id="inlineDownloadBtn" onclick="downloadCSV()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download Google Sheet
+                </button>
+            </div>
+        </div>
+
+        <div id="results" class="results-area">
+            <h3 style="margin-bottom: 20px; color: var(--secondary);">Analysis Results</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Keyword</th>
+                        <th style="width: 15%;">Intent</th>
+                        <th style="width: 15%;">Total Titles</th>
+                        <th style="width: 45%;">Collected Titles</th>
+                        <th style="width: 10%;">Google Link</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- JS will inject rows and gaps here -->
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <script>
+        // --- CONFIGURATION ---
+        const BLACKLIST_DOMAINS = [
+            "reddit", "quora", "amazon", "ebay", "walmart", "pinterest", "instagram",
+            "wikipedia", "youtube", "facebook", "flipkart", "twitter", "linkedin"
+        ];
+        
+        const INFO_SIGNALS = new Set(['how', 'what', 'why', 'guide', 'tips', 'benefits', 'meaning', 'steps', 'plan', 'tutorial', 'best', 'review', 'causes', 'symptoms', 'treatment', 'definition']);
+        const TRANS_SIGNALS = new Set(['buy', 'price', 'cost', 'sale', 'shop', 'store', 'order', 'purchase', 'cheap', 'discount', 'deal', 'promo', 'services', 'agency', 'hire']);
+        
+        const DOMINANCE_THRESHOLD = 0.60; 
+        let storage_box = []; 
+
+        // --- HELPER FUNCTIONS ---
+
+        function classifySingleResult(title, snippet = "") {
+            let textToCheck = (title + " " + snippet).toLowerCase();
+            let transMatches = 0;
+            let infoMatches = 0;
+
+            for (let s of TRANS_SIGNALS) {
+                if (textToCheck.includes(s)) transMatches++;
+            }
+            for (let s of INFO_SIGNALS) {
+                if (textToCheck.includes(s)) infoMatches++;
+            }
+            return (transMatches > infoMatches) ? "GENERIC_COMMERCIAL" : "INFORMATIONAL";
+        }
+
+        function downloadCSV() {
+            if (storage_box.length === 0) return alert("No data to download yet!");
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            let headers = ["Keyword", "Detected_Intent", "Target_Page_Type", "Total_Titles_Collected"];
+            
+            let maxTitles = 0;
+            storage_box.forEach(row => {
+                if (row.titles && row.titles.length > maxTitles) maxTitles = row.titles.length;
+            });
+            for(let i=1; i<=maxTitles; i++) headers.push(`Title_${i}`);
+            
+            csvContent += headers.join(",") + "\n";
+
+            storage_box.forEach(row => {
+                let rowArr = [row.kw, row.intent, row.target, row.total];
+                if(row.titles) {
+                    row.titles.forEach(t => rowArr.push(`"${t}"`));
+                }
+                while(rowArr.length < headers.length) {
+                    rowArr.push("");
+                }
+                csvContent += rowArr.join(",") + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            
+            const date = new Date();
+            const timestamp = `${date.getHours()}:${date.getMinutes()}`;
+            link.setAttribute("download", `Strict Intent Map ${timestamp}.csv`);
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function analyzeKeyword(kw, apiKey) {
+            const url = "https://google.serper.dev/search";
+            const payload = { q: kw, num: 20 }; 
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error("API Error");
+                const data = await response.json();
+                const organic = data.organic || [];
+
+                let tempResults = [];
+                let infoVoteCount = 0;
+                let transVoteCount = 0;
+
+                let validResults = [];
+                for (let res of organic) {
+                    let link = (res.link || "").toLowerCase();
+                    if (BLACKLIST_DOMAINS.some(d => link.includes(d))) continue;
+                    validResults.push(res);
+                }
+
+                let totalValid = validResults.length;
+                if (totalValid === 0) {
+                    return { kw, intent: "No Data", target: "-", total: 0, titles: [] };
+                }
+
+                for (let res of validResults) {
+                    let title = res.title || "";
+                    let snippet = res.snippet || "";
+                    
+                    let resultIntent = classifySingleResult(title, snippet);
+                    
+                    if (resultIntent === 'INFORMATIONAL') infoVoteCount++;
+                    else transVoteCount++;
+
+                    tempResults.push({ title: title, intent: resultIntent });
+                }
+
+                let maxVotes = Math.max(infoVoteCount, transVoteCount);
+                let dominanceRatio = maxVotes / totalValid;
+                
+                let finalIntent = "";
+                let targetPage = "";
+                let finalTitles = [];
+
+                if (dominanceRatio < DOMINANCE_THRESHOLD) {
+                    finalIntent = "MIXED / AMBIGUOUS";
+                    targetPage = "N/A";
+                    finalTitles = []; 
+                } else {
+                    if (transVoteCount > infoVoteCount) {
+                        finalIntent = "GENERIC_COMMERCIAL";
+                        targetPage = "Product / Commercial Page";
+                    } else {
+                        finalIntent = "INFORMATIONAL";
+                        targetPage = "Blog / Guide Page";
+                    }
+                    
+                    for (let item of tempResults) {
+                        if (item.intent === finalIntent) {
+                            finalTitles.push(item.title);
+                        }
+                    }
+                }
+
+                return { kw, intent: finalIntent, target: targetPage, total: finalTitles.length, titles: finalTitles };
+
+            } catch (e) {
+                console.error(e);
+                return { kw, intent: "Error", target: "API Failed", total: 0, titles: [] };
+            }
+        }
+
+        async function runAnalysis() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const input = document.getElementById('keywordInput').value;
+            const btn = document.getElementById('analyzeBtn');
+            const btnText = document.getElementById('btnText');
+            const downloadBtn = document.getElementById('inlineDownloadBtn');
+
+            if (!apiKey) { alert("Please enter your Serper API Key."); return; }
+            if (!input.trim()) { alert("Please enter keywords."); return; }
+
+            btn.disabled = true;
+            btnText.innerHTML = "Analyzing... <span class='loader'></span>";
+            downloadBtn.style.display = "none";
+            document.getElementById('results').classList.remove('active');
+            storage_box = [];
+
+            let keywords = input.split(/[\n,]+/).map(k => k.trim()).filter(k => k.length > 0);
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = ""; 
+
+            for (let i = 0; i < keywords.length; i++) {
+                const kw = keywords[i];
+                const rowId = `row-${i}`;
+                const tempRow = document.createElement('tr');
+                tempRow.id = rowId;
+                tempRow.innerHTML = `<td colspan="5" style="padding:20px; color:#94a3b8; text-align:center;">Analyzing "${kw}"...</td>`;
+                tableBody.appendChild(tempRow);
+
+                await new Promise(r => setTimeout(r, 600)); 
+                const result = await analyzeKeyword(kw, apiKey);
+
+                // Store for CSV
+                storage_box.push(result);
+
+                const finalRow = document.getElementById(rowId);
+                if (finalRow) {
+                    // Update the temp row to actual data
+                    finalRow.className = "data-row"; // Add class for border styling
+
+                    let badgeClass = 'badge-generic';
+                    if (result.intent === 'INFORMATIONAL') badgeClass = 'badge-info';
+                    if (result.intent === 'GENERIC_COMMERCIAL') badgeClass = 'badge-trans';
+                    if (result.intent === 'MIXED / AMBIGUOUS') badgeClass = 'badge-mixed';
+
+                    let titlesHtml = "<ul class='titles-list'>";
+                    if(result.titles.length > 0) {
+                        result.titles.forEach((t, index) => {
+                            titlesHtml += `<li><span>${index + 1}.</span> ${t}</li>`;
+                        });
+                    } else {
+                        titlesHtml += `<li style="color:#94a3b8; font-style:italic;">No titles collected</li>`;
+                    }
+                    titlesHtml += "</ul>";
+
+                    finalRow.innerHTML = `
+                        <td style="font-weight: 500;">${result.kw}</td>
+                        <td><span class="${badgeClass}">${result.intent}</span></td>
+                        <td style="font-size: 0.9rem; font-weight: 600;">${result.total}</td>
+                        <td style="font-size: 0.9rem;">${titlesHtml}</td>
+                        <td>
+                            <a href="https://www.google.com/search?q=${encodeURIComponent(result.kw)}" target="_blank" class="google-link">
+                                View &rarr;
+                            </a>
+                        </td>
+                    `;
+
+                    // NEW: ADD CELL GAP ROW AFTER THIS ROW
+                    // Unless it's the very last keyword
+                    if (i < keywords.length - 1) {
+                        const spacerRow = document.createElement('tr');
+                        spacerRow.className = 'row-spacer';
+                        // Colspan must cover all columns (5 in this case)
+                        spacerRow.innerHTML = `<td colspan="5"></td>`; 
+                        tableBody.appendChild(spacerRow);
+                    }
+                }
+            }
+
+            btn.disabled = false;
+            btnText.innerText = "Analyze Keywords";
+            downloadBtn.style.display = "inline-flex";
+            
+            document.getElementById('results').classList.add('active');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>
