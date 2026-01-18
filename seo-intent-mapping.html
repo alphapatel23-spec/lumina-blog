@@ -3,153 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lumina | Modern Blog</title>
+    <title>Tools vs. Python for Intent Mapping</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- COLORS & BASIC SETUP --- */
-        :root { 
-            --primary: #2563eb; 
-            --secondary: #0f172a; 
-            --text-main: #334155; 
-            --text-light: #64748b; 
-            --bg-body: #f8fafc; 
-            --bg-card: #ffffff; 
-            --border: #e2e8f0; 
-            --font-sans: 'Inter', sans-serif; 
-            --container-width: 1200px; 
-            /* Tool Color (Green from original tag) */
-            --tool-green: #65a30d; 
-        }
+        :root { --primary: #2563eb; --secondary: #0f172a; --text-main: #334155; --text-light: #64748b; --bg-body: #f8fafc; --bg-card: #ffffff; --border: #e2e8f0; --font-sans: 'Inter', sans-serif; --container-width: 800px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font-sans); background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; }
+        body { font-family: var(--font-sans); background-color: var(--bg-body); color: var(--text-main); line-height: 1.7; }
         a { text-decoration: none; color: inherit; transition: 0.2s; }
         ul { list-style: none; }
         img { max-width: 100%; display: block; }
         .container { max-width: var(--container-width); margin: 0 auto; padding: 0 20px; }
         
-        /* Buttons */
-        .btn { 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center;
-            padding: 0.75rem 1.5rem; 
-            border-radius: 50px; 
-            font-weight: 500; 
-            cursor: pointer; 
-            border: none; 
-            font-size: 0.95rem; 
-            transition: all 0.2s ease;
-        }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: #1d4ed8; }
-
-        /* New Tool Button Style */
-        .btn-tool { 
-            background-color: white; 
-            color: var(--tool-green); 
-            border: 2px solid var(--tool-green); 
-        }
-        .btn-tool:hover { 
-            background-color: var(--tool-green); 
-            color: white; 
-        }
-
-        /* Card Tags */
-        .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 4px; background: #e0f2fe; color: var(--primary); margin-bottom: 10px; display: inline-block; }
-
         header { background: var(--bg-card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .nav-container { display: flex; justify-content: space-between; align-items: center; height: 80px; }
         .logo { font-size: 1.5rem; font-weight: 800; color: var(--secondary); }
         .logo span { color: var(--primary); }
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a:hover { color: var(--primary); }
+        .nav-links { display: flex; gap: 30px; font-size: 0.95rem; color: var(--text-light); }
 
-        .hero { padding: 80px 0; text-align: center; }
-        .hero h1 { font-size: 3rem; font-weight: 800; color: var(--secondary); margin-bottom: 20px; }
-        .hero p { color: var(--text-light); max-width: 600px; margin: 0 auto;30px; font-size: 1.2rem; }
+        article { margin-top: 60px; margin-bottom: 80px; background: white; padding: 60px; border-radius: 12px; border: 1px solid var(--border); }
+        .post-meta { color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; }
+        h1 { font-size: 2.5rem; font-weight: 800; color: var(--secondary); line-height: 1.2; margin-bottom: 25px; }
+        .lead { font-size: 1.25rem; color: var(--secondary); font-weight: 400; margin-bottom: 40px; line-height: 1.5; }
+        
+        h2 { font-size: 1.75rem; color: var(--secondary); margin-top: 50px; margin-bottom: 20px; font-weight: 700; }
+        h3 { font-size: 1.35rem; color: var(--secondary); margin-top: 30px; margin-bottom: 15px; font-weight: 600; }
+        
+        p { margin-bottom: 20px; color: #475569; }
+        ul { margin-bottom: 20px; }
+        li { margin-bottom: 10px; padding-left: 20px; position: relative; color: #475569; }
+        li::before { content: "•"; color: var(--primary); font-weight: bold; position: absolute; left: 0; }
+        
+        code { background: #f1f5f9; padding: 2px 5px; border-radius: 4px; font-family: monospace; color: #d946ef; }
+        .pro-tip { background-color: #eff6ff; border-left: 4px solid var(--primary); padding: 20px; margin: 30px 0; font-style: italic; color: var(--secondary); }
+        .cta-box { background-color: #fff7ed; border: 1px solid #fed7aa; padding: 25px; border-radius: 8px; margin-top: 30px; }
+        .cta-box p { color: #9a3412; margin-bottom: 0; font-weight: 500; }
+        
+        .back-btn { display: inline-block; margin-top: 20px; color: var(--text-light); font-weight: 500; }
+        .back-btn:hover { color: var(--primary); }
 
-        /* Hero Button Wrapper */
-        .hero-actions {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 25px; color: var(--secondary); }
-        
-        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; padding-bottom: 80px; }
-        
-        .blog-card { background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: transform 0.3s; display: flex; flex-direction: column; }
-        .blog-card:hover { transform: translateY(-5px); }
-        .card-image { height: 220px; overflow: hidden; }
-        .card-image img { width: 100%; height: 100%; object-fit: cover; }
-        .card-content { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-content h3 { font-size: 1.25rem; margin-bottom: 10px; color: var(--secondary); }
-        .card-content p { color: var(--text-light); margin-bottom: 20px; flex-grow: 1; font-size: 0.95rem; }
-        .read-more { color: var(--primary); font-weight: 600; }
-        .read-more:hover { text-decoration: underline; }
-        
-        footer { background: white; padding: 60px 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-light); }
-        
-        @media (max-width: 600px) { 
-            .nav-links { display: none; } 
-            .hero h1 { font-size: 2rem; } 
-            .hero-actions { flex-direction: column; }
-        }
+        footer { background: white; padding: 40px 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-light); font-size: 0.9rem; }
+        @media (max-width: 768px) { article { padding: 30px 20px; } h1 { font-size: 2rem; } .nav-links { display: none; } }
     </style>
 </head>
 <body>
     <header>
         <div class="container nav-container">
-            <a href="indext.html" class="logo">Lumina<span>.</span></a>
+            <a href="index.html" class="logo">Lumina<span>.</span></a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="indext.html">Home</a></li>
-                    <li><a href="#">Articles</a></li>
-                    <li><a href="#">About</a></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#articles">Articles</a></li>
                 </ul>
             </nav>
         </div>
     </header>
+    
     <main class="container">
-        <section class="hero">
-            <h1>Insights for the<br>Modern Creator</h1>
-            <p>Discover the latest trends in technology, design, and business.</p>
+        <a href="index.html" class="back-btn">&larr; Back to Articles</a>
+        
+        <article>
+            <div class="post-meta">SEO Technical • 2026</div>
+            <h1>Tools vs. Python for Intent Mapping</h1>
             
-            <!-- Updated Hero Actions -->
-            <div class="hero-actions">
-                <a href="#articles" class="btn btn-primary">Start Reading</a>
-                <!-- Moved Tool Button Here -->
-                <a href="tool.html" class="btn btn-tool">Keyword Intent Tool</a>
+            <p class="lead">A deep dive into whether you should use SaaS tools or build custom solutions for keyword clustering.</p>
+            
+            <p>Intent mapping is the backbone of modern SEO strategy. It bridges the gap between a keyword and the content that satisfies the user. But how do you actually do it?</p>
+            <p>You have two main paths: buying a SaaS tool or writing your own Python scripts. The choice you make defines your workflow, your costs, and your flexibility.</p>
+            
+            <h2>The SaaS Approach: Speed and Simplicity</h2>
+            <p>SaaS (Software as a Service) tools like SEMrush, Ahrefs, or dedicated clustering tools are the default for most marketers.</p>
+            
+            <h3>Why people choose SaaS</h3>
+            <ul>
+                <li><strong>No coding required:</strong> You get a visual interface immediately.</li>
+                <li><strong>Integrated data:</strong> Search volume, difficulty, and SERP analysis are built-in.</li>
+                <li><strong>Speed:</strong> You can cluster a list of 1,000 keywords in seconds.</li>
+            </ul>
+            
+            <p>The biggest advantage here is velocity. You pay a monthly subscription, and you get instant results. For agencies juggling multiple clients, this efficiency is often worth the cost.</p>
+
+            <h2>The Python Approach: Customization and Scale</h2>
+            <p>Then there are the technical SEOs who use Python. Libraries like <code>pandas</code>, <code>scikit-learn</code>, and NLP packages allow you to build your own clustering engines.</p>
+            
+            <h3>Why Python wins for advanced users</h3>
+            <ul>
+                <li><strong>Cost:</strong> Once written, the script is free to run (aside from API costs).</li>
+                <li><strong>Control:</strong> You define the logic. You can adjust distance algorithms to match your specific niche.</li>
+                <li><strong>Integration:</strong> You can feed the data directly into your database or CMS without manual export/import.</li>
+            </ul>
+
+            <p>If you have a unique dataset—perhaps thousands of long-tail product descriptions—SaaS tools might struggle with the nuance. A custom Python model can be trained to understand your specific vocabulary.</p>
+
+            <h2>The Trade-Off: Maintenance vs. Flexibility</h2>
+            <p>The hidden cost of Python is maintenance. Google changes its SERP layout, APIs get updated, and libraries depreciate. Your script that worked perfectly in 2025 might break in 2026.</p>
+            <p>With SaaS, the vendor handles the updates. You don't wake up to a broken script because Google changed a class name in the HTML.</p>
+
+            <div class="pro-tip">
+                <strong>Pro Tip (From Experience):</strong><br>
+                Use SaaS for rapid prototyping and standard client work. Use Python when you hit the limits of what the tool allows or when you need to process hundreds of thousands of queries monthly.
             </div>
-        </section>
 
-        <section id="articles">
-            <div class="section-title">Latest Articles</div>
-            <div class="blog-grid">
-                <!-- Article 1 -->
-                <article class="blog-card">
-                    <div class="card-image"><img src="https://picsum.photos/seed/marketing/400/300" alt="Marketing"></div>
-                    <div class="card-content"><span class="tag">Marketing</span><h3>The Future of Digital Marketing</h3><p>How AI, privacy laws, and automation will transform the industry.</p><a href="future-marketing.html" class="read-more">Read Article &rarr;</a></div>
-                </article>
-                
-                <!-- Article 2 -->
-                <article class="blog-card">
-                    <div class="card-image"><img src="https://picsum.photos/seed/design/400/300" alt="Design"></div>
-                    <div class="card-content"><span class="tag">Design</span><h3>Minimalism isn't Dead</h3><p>Why decluttering your UI leads to better conversion rates.</p><a href="#" class="read-more">Read Article &rarr;</a></div>
-                </article>
+            <h2>How to Decide What’s Right for You</h2>
+            <p>Don't choose based on "cool factor." Choose based on workflow.</p>
+            
+            <h3>Choose SaaS if:</h3>
+            <ul>
+                <li>You need results today.</li>
+                <li>You work across multiple unrelated client niches.</li>
+                <li>You prefer a visual interface.</li>
+                <li>You don't want to manage code dependencies.</li>
+            </ul>
+            
+            <h3>Choose Python if:</h3>
+            <ul>
+                <li>You have repetitive, high-volume tasks.</li>
+                <li>You need to integrate keyword data into other internal tools.</li>
+                <li>You want to build a proprietary competitive edge.</li>
+                <li>You have the technical skills (or access to a developer).</li>
+            </ul>
 
-                <!-- Article 3: Mastering CSS Grid REMOVED -->
+            <h2>Conclusion</h2>
+            <p>Neither is "better" universally. SaaS tools are optimized for the 90% use case: fast, reliable, and easy. Python is optimized for the 10%: complex, custom, and scalable.</p>
+            <p>Start with SaaS. If you find yourself wishing for features that don't exist, that’s your signal to start learning Python.</p>
 
-                <!-- Article 4 -->
-                <article class="blog-card">
-                    <div class="card-image"><img src="https://picsum.photos/seed/seo/400/300" alt="SEO Analysis"></div>
-                    <div class="card-content"><span class="tag">SEO</span><h3>Tools vs. Python for Intent Mapping</h3><p>A deep dive into whether you should use SaaS tools or build custom solutions for keyword clustering.</p><a href="seo-intent-mapping.html" class="read-more">Read Article &rarr;</a></div>
-                </article>
+            <div class="cta-box">
+                <p>👉 The best SEOs know how to use tools, but the great ones know how to build them. Start where you are, but keep an eye on automation.</p>
             </div>
-        </section>
+        </article>
     </main>
-    <footer><div class="container"><p>&copy; 2025 Lumina Blog. All rights reserved.</p></div></footer>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Lumina Blog. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>
