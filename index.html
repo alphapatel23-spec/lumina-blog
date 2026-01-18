@@ -7,27 +7,79 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* --- COLORS & BASIC SETUP --- */
-        :root { --primary: #2563eb; --secondary: #0f172a; --text-main: #334155; --text-light: #64748b; --bg-body: #f8fafc; --bg-card: #ffffff; --border: #e2e8f0; --font-sans: 'Inter', sans-serif; --container-width: 1200px; }
+        :root { 
+            --primary: #2563eb; 
+            --secondary: #0f172a; 
+            --text-main: #334155; 
+            --text-light: #64748b; 
+            --bg-body: #f8fafc; 
+            --bg-card: #ffffff; 
+            --border: #e2e8f0; 
+            --font-sans: 'Inter', sans-serif; 
+            --container-width: 1200px; 
+            /* Tool Color (Green from original tag) */
+            --tool-green: #65a30d; 
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-sans); background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; }
         a { text-decoration: none; color: inherit; transition: 0.2s; }
         ul { list-style: none; }
         img { max-width: 100%; display: block; }
         .container { max-width: var(--container-width); margin: 0 auto; padding: 0 20px; }
-        .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 500; cursor: pointer; border: none; font-size: 0.95rem; }
+        
+        /* Buttons */
+        .btn { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            padding: 0.75rem 1.5rem; 
+            border-radius: 50px; 
+            font-weight: 500; 
+            cursor: pointer; 
+            border: none; 
+            font-size: 0.95rem; 
+            transition: all 0.2s ease;
+        }
         .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+
+        /* New Tool Button Style */
+        .btn-tool { 
+            background-color: white; 
+            color: var(--tool-green); 
+            border: 2px solid var(--tool-green); 
+        }
+        .btn-tool:hover { 
+            background-color: var(--tool-green); 
+            color: white; 
+        }
+
+        /* Card Tags */
         .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 4px; background: #e0f2fe; color: var(--primary); margin-bottom: 10px; display: inline-block; }
+
         header { background: var(--bg-card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .nav-container { display: flex; justify-content: space-between; align-items: center; height: 80px; }
         .logo { font-size: 1.5rem; font-weight: 800; color: var(--secondary); }
         .logo span { color: var(--primary); }
         .nav-links { display: flex; gap: 30px; }
         .nav-links a:hover { color: var(--primary); }
+
         .hero { padding: 80px 0; text-align: center; }
         .hero h1 { font-size: 3rem; font-weight: 800; color: var(--secondary); margin-bottom: 20px; }
-        .hero p { color: var(--text-light); max-width: 600px; margin: 0 auto 30px; font-size: 1.2rem; }
+        .hero p { color: var(--text-light); max-width: 600px; margin: 0 auto;30px; font-size: 1.2rem; }
+
+        /* Hero Button Wrapper */
+        .hero-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
         .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 25px; color: var(--secondary); }
+        
         .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; padding-bottom: 80px; }
+        
         .blog-card { background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: transform 0.3s; display: flex; flex-direction: column; }
         .blog-card:hover { transform: translateY(-5px); }
         .card-image { height: 220px; overflow: hidden; }
@@ -37,8 +89,14 @@
         .card-content p { color: var(--text-light); margin-bottom: 20px; flex-grow: 1; font-size: 0.95rem; }
         .read-more { color: var(--primary); font-weight: 600; }
         .read-more:hover { text-decoration: underline; }
+        
         footer { background: white; padding: 60px 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-light); }
-        @media (max-width: 600px) { .nav-links { display: none; } .hero h1 { font-size: 2rem; } }
+        
+        @media (max-width: 600px) { 
+            .nav-links { display: none; } 
+            .hero h1 { font-size: 2rem; } 
+            .hero-actions { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -58,8 +116,15 @@
         <section class="hero">
             <h1>Insights for the<br>Modern Creator</h1>
             <p>Discover the latest trends in technology, design, and business.</p>
-            <a href="#articles" class="btn btn-primary">Start Reading</a>
+            
+            <!-- Updated Hero Actions -->
+            <div class="hero-actions">
+                <a href="#articles" class="btn btn-primary">Start Reading</a>
+                <!-- Moved Tool Button Here -->
+                <a href="tool.html" class="btn btn-tool">Keyword Intent Tool</a>
+            </div>
         </section>
+
         <section id="articles">
             <div class="section-title">Latest Articles</div>
             <div class="blog-grid">
@@ -83,11 +148,7 @@
                     <div class="card-image"><img src="https://picsum.photos/seed/seo/400/300" alt="SEO Analysis"></div>
                     <div class="card-content"><span class="tag">SEO</span><h3>Tools vs. Python for Intent Mapping</h3><p>A deep dive into whether you should use SaaS tools or build custom solutions for keyword clustering.</p><a href="seo-intent-mapping.html" class="read-more">Read Article &rarr;</a></div>
                 </article>
-                <!-- Article 5: THE NEW TOOL -->
-                <article class="blog-card">
-                    <div class="card-image"><img src="https://picsum.photos/seed/analytics/400/300" alt="SEO Tool"></div>
-                    <div class="card-content"><span class="tag" style="background: #ecfccb; color: #65a30d;">Interactive Tool</span><h3>Keyword Intent Analyzer</h3><p>Enter your keywords to detect search intent, find dominant patterns, and generate consensus titles.</p><a href="tool.html" class="read-more">Open Tool &rarr;</a></div>
-                </article>
+                <!-- Article 5 (Tool Card) REMOVED -->
             </div>
         </section>
     </main>
