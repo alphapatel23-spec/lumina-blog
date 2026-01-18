@@ -17,7 +17,6 @@
             --border: #e2e8f0; 
             --font-sans: 'Inter', sans-serif; 
             --container-width: 1200px; 
-            /* Tool Color (Green from original tag) */
             --tool-green: #65a30d; 
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,30 +28,16 @@
         
         /* Buttons */
         .btn { 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center;
-            padding: 0.75rem 1.5rem; 
-            border-radius: 50px; 
-            font-weight: 500; 
-            cursor: pointer; 
-            border: none; 
-            font-size: 0.95rem; 
-            transition: all 0.2s ease;
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 0.75rem 1.5rem; border-radius: 50px; font-weight: 500; 
+            cursor: pointer; border: none; font-size: 0.95rem; transition: all 0.2s ease;
         }
         .btn-primary { background-color: var(--primary); color: white; }
         .btn-primary:hover { background-color: #1d4ed8; }
-
-        /* New Tool Button Style */
         .btn-tool { 
-            background-color: white; 
-            color: var(--tool-green); 
-            border: 2px solid var(--tool-green); 
+            background-color: white; color: var(--tool-green); border: 2px solid var(--tool-green); 
         }
-        .btn-tool:hover { 
-            background-color: var(--tool-green); 
-            color: white; 
-        }
+        .btn-tool:hover { background-color: var(--tool-green); color: white; }
 
         /* Card Tags */
         .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 4px; background: #e0f2fe; color: var(--primary); margin-bottom: 10px; display: inline-block; }
@@ -68,14 +53,7 @@
         .hero h1 { font-size: 3rem; font-weight: 800; color: var(--secondary); margin-bottom: 20px; }
         .hero p { color: var(--text-light); max-width: 600px; margin: 0 auto;30px; font-size: 1.2rem; }
 
-        /* Hero Button Wrapper */
-        .hero-actions {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
+        .hero-actions { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
         .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 25px; color: var(--secondary); }
         
         .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 30px; padding-bottom: 80px; }
@@ -102,10 +80,10 @@
 <body>
     <header>
         <div class="container nav-container">
-            <a href="indext.html" class="logo">Lumina<span>.</span></a>
+            <a href="index.html" class="logo">Lumina<span>.</span></a>
             <nav>
                 <ul class="nav-links">
-                    <li><a href="indext.html">Home</a></li>
+                    <li><a href="index.html">Home</a></li>
                     <li><a href="#">Articles</a></li>
                     <li><a href="#">About</a></li>
                 </ul>
@@ -116,11 +94,8 @@
         <section class="hero">
             <h1>Insights for the<br>Modern Creator</h1>
             <p>Discover the latest trends in technology, design, and business.</p>
-            
-            <!-- Updated Hero Actions -->
             <div class="hero-actions">
                 <a href="#articles" class="btn btn-primary">Start Reading</a>
-                <!-- Moved Tool Button Here -->
                 <a href="tool.html" class="btn btn-tool">Keyword Intent Tool</a>
             </div>
         </section>
@@ -134,18 +109,27 @@
                     <div class="card-content"><span class="tag">Marketing</span><h3>The Future of Digital Marketing</h3><p>How AI, privacy laws, and automation will transform the industry.</p><a href="future-marketing.html" class="read-more">Read Article &rarr;</a></div>
                 </article>
                 
-                <!-- Article 2 -->
+                <!-- Article 3 (Coding) -->
                 <article class="blog-card">
-                    <div class="card-image"><img src="https://picsum.photos/seed/design/400/300" alt="Design"></div>
-                    <div class="card-content"><span class="tag">Design</span><h3>Minimalism isn't Dead</h3><p>Why decluttering your UI leads to better conversion rates.</p><a href="#" class="read-more">Read Article &rarr;</a></div>
+                    <div class="card-image"><img src="https://picsum.photos/seed/code/400/300" alt="Coding"></div>
+                    <div class="card-content"><span class="tag">Coding</span><h3>Mastering CSS Grid</h3><p>A comprehensive guide to building complex layouts with code.</p><a href="#" class="read-more">Read Article &rarr;</a></div>
                 </article>
-
-                <!-- Article 3: Mastering CSS Grid REMOVED -->
 
                 <!-- Article 4 -->
                 <article class="blog-card">
                     <div class="card-image"><img src="https://picsum.photos/seed/seo/400/300" alt="SEO Analysis"></div>
                     <div class="card-content"><span class="tag">SEO</span><h3>Tools vs. Python for Intent Mapping</h3><p>A deep dive into whether you should use SaaS tools or build custom solutions for keyword clustering.</p><a href="seo-intent-mapping.html" class="read-more">Read Article &rarr;</a></div>
+                </article>
+
+                <!-- NEW ARTICLE ADDED HERE -->
+                <article class="blog-card">
+                    <div class="card-image"><img src="https://picsum.photos/seed/career/400/300" alt="Career"></div>
+                    <div class="card-content">
+                        <span class="tag" style="background:#fce7f3; color:#db2777;">Career</span>
+                        <h3>Career Options in Digital Marketing: 2026 A–Z Guide to Success</h3>
+                        <p>A career that actually grows. Skills that don’t become outdated in five years.</p>
+                        <a href="career-options-in-digital-marketing.html" class="read-more">Read Article &rarr;</a>
+                    </div>
                 </article>
             </div>
         </section>
