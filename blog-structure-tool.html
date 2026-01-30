@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Structure Generator | Lumina</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reusing your existing styles for consistency */
+        :root { --primary: #2563eb; --secondary: #0f172a; --text-main: #334155; --bg-body: #f8fafc; --bg-card: #ffffff; --border: #e2e8f0; --font-sans: 'Inter', sans-serif; --tool-purple: #9333ea; }
+        body { font-family: var(--font-sans); background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; margin: 0; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; }
+        .tool-card { background: var(--bg-card); padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid var(--border); }
+        h1 { color: var(--secondary); margin-bottom: 10px; }
+        p.subtitle { color: #64748b; margin-bottom: 30px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--secondary); font-size: 0.9rem; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 1rem; transition: border 0.2s; }
+        input:focus, textarea:focus { outline: none; border-color: var(--tool-purple); }
+        textarea { height: 120px; resize: vertical; }
+        .btn-generate { 
+            width: 100%; padding: 15px; background-color: var(--tool-purple); color: white; 
+            font-weight: 600; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; 
+            transition: background 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-generate:hover { background-color: #7e22ce; }
+        .btn-generate:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+        
+        .status-msg { margin-top: 20px; text-align: center; font-weight: 500; display: none; }
+        .status-msg.error { color: #ef4444; }
+        .status-msg.success { color: #16a34a; }
+        
+        .spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid #fff; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tool-card">
+            <h1>AI Blog Structure Generator</h1>
+            <p class="subtitle">Enter your keywords and API keys to generate a full SEO report, briefs, and persona analysis.</p>
+            
+            <form id="toolForm">
+                <div class="form-group">
+                    <label for="groqKey">Groq API Key</label>
+                    <input type="password" id="groqKey" placeholder="gsk_..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="serperKey">Serper API Key</label>
+                    <input type="password" id="serperKey" placeholder="4059..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="keywords">Keywords (One per line or comma separated)</label>
+                    <textarea id="keywords" placeholder="heritage places in india&#10;best seo audit tools 2026" required></textarea>
+                </div>
+
+                <button type="submit" class="btn-generate" id="submitBtn">
+                    <span class="btn-text">Generate Report</span>
+                    <div class="spinner" id="spinner"></div>
+                </button>
+            </form>
+
+            <div id="statusMsg" class="status-msg"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('toolForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('spinner');
+            const btnText = document.querySelector('.btn-text');
+            const statusMsg = document.getElementById('statusMsg');
+
+            // UI Loading State
+            submitBtn.disabled = true;
+            spinner.style.display = 'block';
+            btnText.textContent = 'Analyzing... (This may take 1-2 minutes)';
+            statusMsg.style.display = 'none';
+
+            const groqKey = document.getElementById('groqKey').value;
+            const serperKey = document.getElementById('serperKey').value;
+            const keywordsRaw = document.getElementById('keywords').value;
+            
+            // Format keywords as an array
+            const keywords = keywordsRaw.split(/[\n,]+/).map(k => k.trim()).filter(k => k.length > 0);
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        groq_key: groqKey, 
+                        serper_key: serperKey, 
+                        keywords: keywords 
+                    })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error || 'Server error');
+                }
+
+                // Handle file download
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "SEO_Master_Plan.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                statusMsg.textContent = "✅ Report Generated Successfully!";
+                statusMsg.className = "status-msg success";
+                statusMsg.style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                statusMsg.textContent = "❌ Error: " + error.message;
+                statusMsg.className = "status-msg error";
+                statusMsg.style.display = 'block';
+            } finally {
+                // Reset UI
+                submitBtn.disabled = false;
+                spinner.style.display = 'none';
+                btnText.textContent = 'Generate Report';
+            }
+        });
+    </script>
+</body>
+</html>
