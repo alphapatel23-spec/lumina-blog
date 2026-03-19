@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LinkedIn Auto Poster</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    input {
+      width: 400px;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #22c55e;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🚀 LinkedIn Auto Poster</h1>
+
+  <input id="topic" placeholder="Enter topic..." />
+  <br>
+
+  <button onclick="post()">Generate & Post</button>
+
+  <p id="status"></p>
+
+  <script>
+    async function post() {
+      const topic = document.getElementById("topic").value;
+
+      if (!topic) {
+        alert("Enter topic");
+        return;
+      }
+
+      document.getElementById("status").innerText = "Posting...";
+
+      await fetch("http://localhost:3000/post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ topic })
+      });
+
+      document.getElementById("status").innerText = "Done 🚀";
+    }
+  </script>
+
+</body>
+</html>
