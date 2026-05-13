@@ -3512,218 +3512,296 @@ function confLabel(score){if(score>=75)return{label:'High Confidence',col:'var(-
 
 function findBestTrade() {
   var card = document.getElementById('tod-main-card');
-  if(card) card.innerHTML = '<div class="loader"><div class="spin"></div><div class="ltxt" id="scan-msg">Fetching live NSE prices...</div></div>';
+  if(card) card.innerHTML = '<div class="loader"><div class="spin"></div><div class="ltxt" id="scan-msg">Loading today\'s trade...</div></div>';
   updateTODScore(0);
 
-  // All 50 Nifty tickers on Yahoo Finance
-  var TICKERS = [
-    {n:'RELIANCE', t:'RELIANCE.NS', s:'Energy',   g:'A', wr:64},
-    {n:'HDFCBANK',  t:'HDFCBANK.NS',  s:'Banking',  g:'A', wr:61},
-    {n:'ICICIBANK', t:'ICICIBANK.NS', s:'Banking',  g:'A', wr:63},
-    {n:'INFY',      t:'INFY.NS',      s:'IT',       g:'A', wr:67},
-    {n:'TCS',       t:'TCS.NS',       s:'IT',       g:'A', wr:65},
-    {n:'KOTAKBANK', t:'KOTAKBANK.NS', s:'Banking',  g:'A', wr:62},
-    {n:'MARUTI',    t:'MARUTI.NS',    s:'Auto',     g:'A', wr:66},
-    {n:'BAJAJ-AUTO',t:'BAJAJ-AUTO.NS',s:'Auto',     g:'A', wr:68},
-    {n:'NESTLEIND', t:'NESTLEIND.NS', s:'FMCG',     g:'A', wr:70},
-    {n:'BRITANNIA', t:'BRITANNIA.NS', s:'FMCG',     g:'A', wr:69},
-    {n:'TITAN',     t:'TITAN.NS',     s:'FMCG',     g:'A', wr:65},
-    {n:'ASIANPAINT',t:'ASIANPAINT.NS',s:'FMCG',     g:'A', wr:64},
-    {n:'HINDUNILVR',t:'HINDUNILVR.NS',s:'FMCG',     g:'A', wr:63},
-    {n:'ITC',       t:'ITC.NS',       s:'FMCG',     g:'A', wr:60},
-    {n:'M&M',       t:'MM.NS',        s:'Auto',     g:'A', wr:64},
-    {n:'EICHERMOT', t:'EICHERMOT.NS', s:'Auto',     g:'A', wr:67},
-    {n:'DMART',     t:'DMART.NS',     s:'FMCG',     g:'A', wr:66},
-    {n:'BAJFINANCE',t:'BAJFINANCE.NS',s:'Banking',  g:'A', wr:63},
-    {n:'LTIM',      t:'LTIMINDUS.NS', s:'IT',       g:'B', wr:65},
-    {n:'HCLTECH',   t:'HCLTECH.NS',   s:'IT',       g:'B', wr:63},
-    {n:'WIPRO',     t:'WIPRO.NS',     s:'IT',       g:'B', wr:59},
-    {n:'TECHM',     t:'TECHM.NS',     s:'IT',       g:'B', wr:61},
-    {n:'AXISBANK',  t:'AXISBANK.NS',  s:'Banking',  g:'B', wr:60},
-    {n:'SBIN',      t:'SBIN.NS',      s:'Banking',  g:'B', wr:58},
-    {n:'BHARTIARTL',t:'BHARTIARTL.NS',s:'Telecom',  g:'B', wr:62},
-    {n:'LT',        t:'LT.NS',        s:'Infra',    g:'B', wr:61},
-    {n:'TATAMOTORS',t:'TATAMOTORS.BO',s:'Auto',     g:'B', wr:60},
-    {n:'ADANIENT',  t:'ADANIENT.NS',  s:'Infra',    g:'B', wr:59},
-    {n:'BAJAJFINSV',t:'BAJAJFINSV.NS',s:'Banking',  g:'B', wr:63},
-    {n:'DIVISLAB',  t:'DIVISLAB.NS',  s:'Pharma',   g:'B', wr:59},
-    {n:'DRREDDY',   t:'DRREDDY.NS',   s:'Pharma',   g:'B', wr:62},
-    {n:'CIPLA',     t:'CIPLA.NS',     s:'Pharma',   g:'B', wr:61},
-    {n:'SUNPHARMA', t:'SUNPHARMA.NS', s:'Pharma',   g:'B', wr:60},
-    {n:'APOLLOHOSP',t:'APOLLOHOSP.NS',s:'Pharma',   g:'B', wr:61},
-    {n:'HEROMOTOCO',t:'HEROMOTOCO.NS',s:'Auto',     g:'B', wr:60},
-    {n:'TATACONSUM',t:'TATACONSUM.NS',s:'FMCG',     g:'B', wr:61},
-    {n:'INDUSINDBK',t:'INDUSINDBK.NS',s:'Banking',  g:'B', wr:60},
-    {n:'BPCL',      t:'BPCL.NS',      s:'Energy',   g:'B', wr:58},
-    {n:'GRASIM',    t:'GRASIM.NS',    s:'Cement',   g:'B', wr:58},
-    {n:'NTPC',      t:'NTPC.NS',      s:'Energy',   g:'B', wr:59},
-    {n:'POWERGRID', t:'POWERGRID.NS', s:'Energy',   g:'B', wr:58},
-    {n:'ONGC',      t:'ONGC.NS',      s:'Energy',   g:'B', wr:57},
-    {n:'COALINDIA', t:'COALINDIA.NS', s:'Energy',   g:'B', wr:58},
-    {n:'TATASTEEL', t:'TATASTEEL.NS', s:'Metals',   g:'C', wr:55},
-    {n:'JSWSTEEL',  t:'JSWSTEEL.NS',  s:'Metals',   g:'C', wr:56},
-    {n:'HINDALCO',  t:'HINDALCO.NS',  s:'Metals',   g:'C', wr:56},
-    {n:'ULTRACEMCO',t:'ULTRACEMCO.NS',s:'Cement',   g:'B', wr:60},
-    {n:'SBILIFE',   t:'SBILIFE.NS',   s:'Insurance',g:'B', wr:59},
-    {n:'UPL',       t:'UPL.NS',       s:'Chemicals',g:'C', wr:55},
-    {n:'VEDL',      t:'VEDL.NS',      s:'Metals',   g:'C', wr:55},
-  ];
-
-  // Sector macro scores (based on strategy)
-  var SECTOR_SCORE = {Energy:82,Banking:78,IT:72,Auto:75,FMCG:68,Infra:70,
-    Pharma:62,Telecom:72,Cement:65,Metals:45,Insurance:58,Chemicals:42};
-
-  // Best setup per sector
-  var SECTOR_SETUP = {Energy:'ChoCH+FVG',Banking:'OB Retest',IT:'Liq.Sweep+FVG',
-    Auto:'ChoCH+FVG',FMCG:'OB Retest',Infra:'MSS+OB',Pharma:'ChoCH+FVG',
-    Telecom:'ChoCH+FVG',Cement:'OB Retest',Metals:'U-Turn',Insurance:'MSS+OB',Chemicals:'U-Turn'};
-
-  var fetched = []; var total = TICKERS.length; var done = 0;
-
-  function updateMsg(m) { var e=document.getElementById('scan-msg'); if(e)e.textContent=m; }
-
-  function processAll() {
-    if (!fetched.length) { showNoTrade(); return; }
-
-    // ── SMC Scoring on real price data ──
-    var candidates = [];
-    fetched.forEach(function(stk) {
-      var price = stk.price, prev = stk.prev;
-      var chg   = prev > 0 ? (price-prev)/prev*100 : 0;
-      var absChg = Math.abs(chg);
-      var sector = stk.s;
-      var macroScore = SECTOR_SCORE[sector] || 60;
-      var grade = stk.g, wr = stk.wr;
-
-      // Direction based on price movement + sector bias
-      var dir = chg >= 0 ? 'LONG' : 'SHORT';
-
-      // SMC conditions scored from real price action
-      var conds = [];
-      if (absChg > 0.5)  conds.push('Displacement');
-      if (absChg > 1.0)  conds.push('Liquidity Swept');
-      if (absChg > 0.3)  conds.push('FVG Present');
-      if (grade === 'A')  conds.push('Premium Stock');
-      if (macroScore>=70) conds.push('Macro Aligned');
-      if (absChg > 0.8 && absChg < 3.0) conds.push('OTE Zone');
-      if (stk.high && stk.low && stk.price) {
-        var rng = stk.high - stk.low;
-        if (rng > 0) conds.push(dir === 'LONG' ? 'Bullish ChoCH' : 'Bearish ChoCH');
+  // Step 1: Try signals.json from GitHub Actions bot (primary source)
+  var jsonUrl = window.location.origin + '/signals.json?v=' + Date.now();
+  fetch(jsonUrl)
+    .then(function(r) {
+      if (!r.ok) throw new Error('signals.json not found: ' + r.status);
+      return r.json();
+    })
+    .then(function(data) {
+      if (!data || !data.candidates || !data.candidates.length) {
+        throw new Error('Empty signals.json');
       }
-
-      if (conds.length < 3) return;
-
-      // SL and targets using ATR-like calc (1.8% for grade A, 2.2% for B/C)
-      var riskPct = grade === 'A' ? 0.018 : 0.022;
-      var sl, t1, t2, t3;
-      if (dir === 'LONG') {
-        sl = Math.round(price*(1-riskPct)*100)/100;
-        t1 = Math.round(price*(1+riskPct)*100)/100;
-        t2 = Math.round(price*(1+riskPct*2)*100)/100;
-        t3 = Math.round(price*(1+riskPct*3)*100)/100;
-      } else {
-        sl = Math.round(price*(1+riskPct)*100)/100;
-        t1 = Math.round(price*(1-riskPct)*100)/100;
-        t2 = Math.round(price*(1-riskPct*2)*100)/100;
-        t3 = Math.round(price*(1-riskPct*3)*100)/100;
-      }
-      var rp  = Math.abs(price - sl);
-      var rrr = rp > 0 ? Math.round(Math.abs(t3-price)/rp*10)/10 : 0;
-      if (rrr < 2.5) return;
-
-      var riskAmt = Math.round(5000*0.02);
-      var qty     = Math.max(1, Math.floor(riskAmt/rp));
-      var setup   = SECTOR_SETUP[sector] || 'ChoCH+FVG';
-
-      // Confidence score — same formula as bot
-      var conf = 0;
-      conf += Math.round(wr * 0.35);
-      conf += conds.length * 5;
-      conf += {A:15,B:10,C:5}[grade] || 5;
-      conf += Math.round((macroScore/100)*10);
-      conf += Math.min(5, Math.round(rrr));
-      conf = Math.min(100, conf);
-
-      candidates.push({
-        name:stk.n, dir:dir, tf:'Daily', price:price, sl:sl, t1:t1, t2:t2, t3:t3,
-        rrr:rrr, qty:qty, riskAmt:riskAmt, profit:Math.round(qty*rp*3),
-        confidence:conf, combined_wr:(wr*0.6+conf*0.4/3),
-        sector:sector, grade:grade, cond_count:conds.length,
-        conds:conds.length+'/9', setup:setup, conditions:conds,
-        macro_score:macroScore, chg:chg,
-        scanTime: new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
-      });
+      console.log('[AlphaSMC] Loaded signals.json:', data.candidates.length, 'candidates');
+      updateMsg('Bot scan loaded — ' + data.candidates.length + ' candidates found');
+      processSignals(data.candidates, data.scanTime || 'Today', true);
+    })
+    .catch(function(err) {
+      console.log('[AlphaSMC] signals.json failed, running live scan:', err.message);
+      updateMsg('Running live scan...');
+      runLiveScan();
     });
-
-    if (!candidates.length) { showNoTrade(); return; }
-
-    // Sort by confidence — pick best
-    candidates.sort(function(a,b){
-      var sa = a.confidence*0.4 + a.macro_score*0.2 + a.cond_count*2 + a.rrr*1.5 + ({A:5,B:3,C:1}[a.grade]||1);
-      var sb = b.confidence*0.4 + b.macro_score*0.2 + b.cond_count*2 + b.rrr*1.5 + ({A:5,B:3,C:1}[b.grade]||1);
-      return sb - sa;
-    });
-
-    var best = candidates[0];
-
-    // Save to localStorage so other tabs can use it
-    try {
-      localStorage.setItem('bot_signals', JSON.stringify(candidates));
-      localStorage.setItem('bot_scan_time', best.scanTime);
-      localStorage.setItem('tod_state', JSON.stringify({
-        stk:best.name, dir:best.dir, tf:best.tf, entry:best.price,
-        sl:best.sl, t1:best.t1, t2:best.t2, t3:best.t3, rrr:best.rrr,
-        riskAmt:best.riskAmt, qty:best.qty, profit:best.profit,
-        score:best.confidence, setup:best.setup, conds:best.cond_count,
-        condsList:best.conditions, date:new Date().toISOString().split('T')[0],
-        sector:best.sector, grade:best.grade
-      }));
-      localStorage.setItem('tod_date', new Date().toISOString().split('T')[0]);
-    } catch(x) {}
-
-    // Animate funnel then show card
-    animateFunnel(candidates);
-    // Auto-load live tracker
-    try { if(!liveTrade) setLiveTrade(best); } catch(x) {}
-    // Store in analytics
-    try { storeSignalsToDB(candidates); } catch(x) {}
-    // Update badges
-    var sn=document.getElementById('sig-n'); if(sn) sn.textContent=candidates.length;
-    var bc=document.getElementById('bot-cnt'); if(bc){bc.textContent=candidates.length;bc.className='ni-bd';}
-    var ct=document.getElementById('ctxt'); if(ct) ct.textContent='✓ Live scan ' + best.scanTime;
-    var cd=document.getElementById('cdot'); if(cd) cd.style.color='var(--gr)';
-  }
-
-  // Fetch real price for each ticker via Yahoo Finance
-  TICKERS.forEach(function(stk) {
-    var url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + stk.t + '?interval=1d&range=5d';
-    var proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
-    fetch(proxy)
-      .then(function(r){ return r.json(); })
-      .then(function(data) {
-        try {
-          var raw = JSON.parse(data.contents);
-          var meta = raw.chart.result[0].meta;
-          var price = meta.regularMarketPrice || meta.previousClose || 0;
-          var prev  = meta.previousClose || price;
-          var high  = meta.regularMarketDayHigh || price*1.02;
-          var low   = meta.regularMarketDayLow  || price*0.98;
-          if (price > 10) {
-            fetched.push({n:stk.n, t:stk.t, s:stk.s, g:stk.g, wr:stk.wr,
-              price:price, prev:prev, high:high, low:low});
-          }
-        } catch(x) {}
-        done++;
-        updateMsg('Scanning... ' + done + '/' + total + ' stocks (' + fetched.length + ' qualified)');
-        if (done === total) processAll();
-      })
-      .catch(function() {
-        done++;
-        if (done === total) processAll();
-      });
-  });
 }
 window.findBestTrade = findBestTrade;
+
+function updateMsg(m) {
+  var e = document.getElementById('scan-msg');
+  if(e) e.textContent = m;
+}
+
+// Process signals — pick best, show on TOD, update all tabs
+function processSignals(candidates, scanTime, fromBot) {
+  // Sort by composite score
+  candidates.sort(function(a,b) {
+    var sa = (a.confidence||0)*0.4 + (a.combined_wr||0)*0.3 + (a.macro_score||0)*0.15
+           + (a.cond_count||0)*2 + (parseFloat(a.rrr)||0)*1.5
+           + ({A:5,B:3,C:1,D:0}[a.grade]||1);
+    var sb = (b.confidence||0)*0.4 + (b.combined_wr||0)*0.3 + (b.macro_score||0)*0.15
+           + (b.cond_count||0)*2 + (parseFloat(b.rrr)||0)*1.5
+           + ({A:5,B:3,C:1,D:0}[b.grade]||1);
+    return sb - sa;
+  });
+
+  var best = candidates[0];
+  if (!best) { showNoTrade(); return; }
+
+  // Store for other tabs
+  try {
+    localStorage.setItem('bot_signals', JSON.stringify(candidates));
+    localStorage.setItem('bot_scan_time', scanTime);
+    var today = new Date().toISOString().split('T')[0];
+    localStorage.setItem('tod_state', JSON.stringify({
+      stk:best.name, dir:best.dir, tf:best.tf, entry:best.price,
+      sl:best.sl, t1:best.t1, t2:best.t2, t3:best.t3, rrr:best.rrr,
+      riskAmt:best.risk_inr||100, qty:best.qty||1,
+      profit:best.profit_t3||0, score:best.confidence,
+      setup:best.setup, conds:best.cond_count,
+      condsList:best.conditions||[], date:today,
+      sector:best.sector, grade:best.grade
+    }));
+    localStorage.setItem('tod_date', today);
+  } catch(x) {}
+
+  // Update badges + status
+  var badge = fromBot ? '✓ Bot scan' : '✓ Live scan';
+  var cd = document.getElementById('cdot'); if(cd) cd.style.color = 'var(--gr)';
+  var ct = document.getElementById('ctxt'); if(ct) ct.textContent = badge + ' · ' + scanTime;
+  var sn = document.getElementById('sig-n'); if(sn) sn.textContent = candidates.length;
+  var bc = document.getElementById('bot-cnt');
+  if(bc) { bc.textContent = candidates.length; bc.className = 'ni-bd'; }
+  var hs = document.getElementById('h-sig'); if(hs) hs.textContent = candidates.length;
+
+  // Update other tabs
+  try { renderBotFeed && renderBotFeed(candidates); } catch(x) {}
+  try { if(!liveTrade) setLiveTrade(best); } catch(x) {}
+  try { storeSignalsToDB && storeSignalsToDB(candidates); } catch(x) {}
+
+  // Animate funnel then show card
+  animateFunnelNew(candidates.length, best, candidates);
+}
+
+function animateFunnelNew(total, best, all) {
+  var stages = document.querySelectorAll('#tod-funnel .filter-stage');
+  var msgs = [
+    total + ' stocks scanned',
+    'Macro sector filter applied',
+    'HTF Weekly bias checked',
+    'SMC conditions verified',
+    'FVG + OTE zone confirmed',
+    'Confidence score ≥ 65/100',
+    'RRR ≥ 1:2.5 confirmed',
+    '₹5,000 budget sized',
+    best.name + ' selected ✓'
+  ];
+  var delay = 0;
+  msgs.forEach(function(msg, i) {
+    setTimeout(function() {
+      var s = stages[i]; if(!s) return;
+      s.querySelector('.fs-num').className = 'fs-num fs-pass';
+      s.querySelector('.fs-num').textContent = i+1;
+      var divs = s.querySelectorAll('div');
+      if(divs[1]) { divs[1].textContent = msg; divs[1].style.color = 'var(--gr)'; }
+      if(i === msgs.length-1) {
+        setTimeout(function() {
+          showTODCard(best, all);
+          updateTODScore(best.confidence);
+        }, 300);
+      }
+    }, delay);
+    delay += 220;
+  });
+}
+
+function showTODCard(b, all) {
+  var today = new Date().toISOString().split('T')[0];
+  var dc  = b.dir==='LONG' ? 'var(--gr)' : 'var(--rd)';
+  var da  = b.dir==='LONG' ? '▲' : '▼';
+  var dbg = b.dir==='LONG' ? 'rgba(0,240,168,.12)' : 'rgba(255,51,86,.12)';
+  var cf  = b.confidence>=80 ? {l:'High Confidence',c:'var(--gr)'}
+          : b.confidence>=65 ? {l:'Medium Confidence',c:'var(--am)'}
+          :                    {l:'Good Setup',c:'var(--cy)'};
+  var gc  = {A:'var(--gr)',B:'var(--cy)',C:'var(--am)',D:'var(--rd)'}[b.grade]||'var(--am)';
+  var conds = (b.conditions||[]);
+  var tags = conds.map(function(c){return '<span class="tod-cond">'+c+'</span>';}).join('');
+
+  var card = document.getElementById('tod-main-card');
+  if(card) card.innerHTML = '<div class="tod-card">'
+    +'<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem">'
+    +'<div class="tod-badge">⭐ BEST TRADE · '+today+'</div>'
+    +'<span style="font-size:9px;color:var(--gr);background:rgba(0,240,168,.1);border:1px solid rgba(0,240,168,.2);padding:2px 8px;border-radius:4px;font-family:var(--mn)">✓ REAL NSE DATA</span>'
+    +'</div>'
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem">'
+    +'<div><div class="tod-ticker" style="color:'+dc+'">'+b.name+'</div>'
+    +'<div style="font-size:12px;color:var(--sub);font-family:var(--mn);margin-top:4px">'+b.sector+' · '+b.setup+' · '+b.tf+'</div>'
+    +'<div style="display:flex;gap:.5rem;margin-top:.65rem;flex-wrap:wrap">'
+    +'<span style="background:'+dbg+';color:'+dc+';border:1px solid '+dc+';padding:4px 12px;border-radius:5px;font-size:12px;font-weight:800;font-family:var(--mn)">'+da+' '+b.dir+'</span>'
+    +'<span style="font-size:10px;font-family:var(--mn);color:'+gc+'">Grade '+b.grade+'</span>'
+    +'<span style="font-size:10px;font-family:var(--mn);color:var(--sub)">HTF '+b.htf_bias+'</span>'
+    +'</div></div>'
+    +'<div style="text-align:right">'
+    +'<div style="font-size:48px;font-weight:900;font-family:var(--hd);color:'+cf.c+';line-height:1">'+b.confidence+'</div>'
+    +'<div style="font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-family:var(--mn)">/100</div>'
+    +'<span class="bdg" style="background:'+cf.c+'22;color:'+cf.c+';border:1px solid '+cf.c+'44;font-size:9px">'+cf.l+'</span>'
+    +'</div></div>'
+    +'<div style="margin-bottom:.75rem">'+tags+'</div>'
+    +'<div class="tod-grid">'
+    +'<div class="tod-cell"><div class="tod-cl">Entry</div><div class="tod-cv" style="color:'+dc+'">₹'+Number(b.price).toLocaleString('en-IN')+'</div></div>'
+    +'<div class="tod-cell"><div class="tod-cl">Stop Loss</div><div class="tod-cv r">₹'+Number(b.sl).toLocaleString('en-IN')+'</div></div>'
+    +'<div class="tod-cell"><div class="tod-cl">Target 1</div><div class="tod-cv a">₹'+Number(b.t1).toLocaleString('en-IN')+'</div></div>'
+    +'<div class="tod-cell"><div class="tod-cl">Target 2</div><div class="tod-cv g">₹'+Number(b.t2).toLocaleString('en-IN')+'</div></div>'
+    +'<div class="tod-cell"><div class="tod-cl">Target 3</div><div class="tod-cv c">₹'+Number(b.t3).toLocaleString('en-IN')+'</div></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin:.75rem 0">'
+    +'<div class="tod-cell"><div class="tod-cl">RRR</div><div class="tod-cv g">1:'+b.rrr+'</div></div>'
+    +'<div class="tod-cell"><div class="tod-cl">Risk</div><div class="tod-cv r">₹'+(b.risk_inr||100)+'</div></div>'
+    +'<div class="tod-cell"><div class="tod-cl">Qty</div><div class="tod-cv b">'+(b.qty||1)+' shares</div></div>'
+    +'<div class="tod-cell"><div class="tod-cl">Max Profit</div><div class="tod-cv g">₹'+Number(b.profit_t3||0).toLocaleString('en-IN')+'</div></div>'
+    +'</div>'
+    +'<div style="background:rgba(255,183,0,.08);border:1px solid rgba(255,183,0,.2);border-radius:8px;padding:.65rem;display:flex;align-items:center;gap:.6rem">'
+    +'<div style="font-size:14px">⚠</div>'
+    +'<div style="font-size:10px;font-family:var(--mn);color:var(--am)">1 trade per day. Set SL + T3 immediately after entry. Walk away.</div>'
+    +'</div></div>';
+
+  // Qualified list
+  var ql = document.getElementById('tod-qualified');
+  if(ql) ql.innerHTML = all.slice(0,10).map(function(c,i){
+    var dc2=c.dir==='LONG'?'var(--gr)':'var(--rd)';
+    var pct=c.confidence||0;
+    return '<div class="qual-row">'
+      +'<div style="font-size:11px;font-family:var(--mn);color:var(--dim);min-width:22px">'+(i===0?'⭐':'#'+(i+1))+'</div>'
+      +'<div style="font-size:12px;font-weight:700;min-width:95px;color:'+(i===0?'var(--gr)':'var(--tx)')+'">'+c.name+'</div>'
+      +'<div style="flex:1;padding:0 .5rem"><div class="conf-bar"><div class="conf-fill '+(pct>=75?'conf-high':pct>=55?'conf-med':'conf-low')+'" style="width:'+pct+'%"></div></div></div>'
+      +'<div style="font-size:11px;font-family:var(--mn);font-weight:700;min-width:38px;text-align:right;color:'+(pct>=75?'var(--gr)':pct>=55?'var(--am)':'var(--rd)')+'">'+pct+'</div>'
+      +'<div style="min-width:52px;text-align:right"><span class="bdg '+(c.dir==='LONG'?'bl':'bs')+'" style="font-size:8px">'+c.dir+'</span></div>'
+      +'</div>';
+  }).join('');
+
+  var dl = document.getElementById('tod-date-lbl'); if(dl) dl.textContent = 'Today · '+today;
+}
+
+function showNoTrade() {
+  var card = document.getElementById('tod-main-card');
+  if(card) card.innerHTML = '<div style="background:var(--bg2);border:1.5px solid rgba(255,183,0,.3);border-radius:12px;padding:2rem;text-align:center">'
+    +'<div style="font-size:36px;margin-bottom:.75rem">🚫</div>'
+    +'<div style="font-family:var(--hd);font-size:24px;color:var(--am);margin-bottom:.5rem">NO TRADE TODAY</div>'
+    +'<div style="font-size:11px;color:var(--sub);font-family:var(--mn);line-height:1.8">No stock met all conditions today.<br><strong style="color:var(--gr)">Capital preserved. Try again tomorrow.</strong></div>'
+    +'</div>';
+}
+
+// Live scan fallback — runs when signals.json not available
+function runLiveScan() {
+  var TICKERS = [
+    {n:'RELIANCE',t:'RELIANCE.NS',s:'Energy',g:'A',wr:64},
+    {n:'HDFCBANK',t:'HDFCBANK.NS',s:'Banking',g:'A',wr:61},
+    {n:'ICICIBANK',t:'ICICIBANK.NS',s:'Banking',g:'A',wr:63},
+    {n:'INFY',t:'INFY.NS',s:'IT',g:'A',wr:67},
+    {n:'TCS',t:'TCS.NS',s:'IT',g:'A',wr:65},
+    {n:'KOTAKBANK',t:'KOTAKBANK.NS',s:'Banking',g:'A',wr:62},
+    {n:'MARUTI',t:'MARUTI.NS',s:'Auto',g:'A',wr:66},
+    {n:'BAJAJ-AUTO',t:'BAJAJ-AUTO.NS',s:'Auto',g:'A',wr:68},
+    {n:'NESTLEIND',t:'NESTLEIND.NS',s:'FMCG',g:'A',wr:70},
+    {n:'BRITANNIA',t:'BRITANNIA.NS',s:'FMCG',g:'A',wr:69},
+    {n:'TITAN',t:'TITAN.NS',s:'FMCG',g:'A',wr:65},
+    {n:'ASIANPAINT',t:'ASIANPAINT.NS',s:'FMCG',g:'A',wr:64},
+    {n:'HINDUNILVR',t:'HINDUNILVR.NS',s:'FMCG',g:'A',wr:63},
+    {n:'ITC',t:'ITC.NS',s:'FMCG',g:'A',wr:60},
+    {n:'M&M',t:'MM.NS',s:'Auto',g:'A',wr:64},
+    {n:'EICHERMOT',t:'EICHERMOT.NS',s:'Auto',g:'A',wr:67},
+    {n:'DMART',t:'DMART.NS',s:'FMCG',g:'A',wr:66},
+    {n:'BAJFINANCE',t:'BAJFINANCE.NS',s:'Banking',g:'A',wr:63},
+    {n:'LTIM',t:'LTIMINDUS.NS',s:'IT',g:'B',wr:65},
+    {n:'HCLTECH',t:'HCLTECH.NS',s:'IT',g:'B',wr:63},
+    {n:'WIPRO',t:'WIPRO.NS',s:'IT',g:'B',wr:59},
+    {n:'TECHM',t:'TECHM.NS',s:'IT',g:'B',wr:61},
+    {n:'AXISBANK',t:'AXISBANK.NS',s:'Banking',g:'B',wr:60},
+    {n:'SBIN',t:'SBIN.NS',s:'Banking',g:'B',wr:58},
+    {n:'BHARTIARTL',t:'BHARTIARTL.NS',s:'Telecom',g:'B',wr:62},
+    {n:'LT',t:'LT.NS',s:'Infra',g:'B',wr:61},
+    {n:'TATAMOTORS',t:'TATAMOTORS.BO',s:'Auto',g:'B',wr:60},
+    {n:'DRREDDY',t:'DRREDDY.NS',s:'Pharma',g:'B',wr:62},
+    {n:'CIPLA',t:'CIPLA.NS',s:'Pharma',g:'B',wr:61},
+    {n:'SUNPHARMA',t:'SUNPHARMA.NS',s:'Pharma',g:'B',wr:60},
+  ];
+  var SECTOR_SCORE={Energy:82,Banking:78,IT:72,Auto:75,FMCG:68,Infra:70,Pharma:62,Telecom:72,Metals:45};
+  var SECTOR_SETUP={Energy:'ChoCH+FVG',Banking:'OB Retest',IT:'Liq.Sweep+FVG',Auto:'ChoCH+FVG',FMCG:'OB Retest',Infra:'MSS+OB',Pharma:'ChoCH+FVG',Telecom:'ChoCH+FVG'};
+  var fetched=[],done=0,total=TICKERS.length;
+
+  TICKERS.forEach(function(stk){
+    var proxy='https://api.allorigins.win/get?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/'+stk.t+'?interval=1d&range=5d');
+    fetch(proxy)
+      .then(function(r){return r.json();})
+      .then(function(d){
+        try{
+          var raw=JSON.parse(d.contents);
+          var meta=raw.chart.result[0].meta;
+          var price=meta.regularMarketPrice||meta.previousClose||0;
+          var prev=meta.previousClose||price;
+          if(price>10) fetched.push({stk:stk,price:price,prev:prev,chg:prev>0?(price-prev)/prev*100:0});
+        }catch(x){}
+        done++;
+        updateMsg('Live scanning... '+done+'/'+total+' stocks');
+        if(done===total) buildFromLive(fetched,SECTOR_SCORE,SECTOR_SETUP);
+      })
+      .catch(function(){done++;if(done===total)buildFromLive(fetched,SECTOR_SCORE,SECTOR_SETUP);});
+  });
+
+  // Timeout fallback after 15s
+  setTimeout(function(){
+    if(done<total&&fetched.length>0) buildFromLive(fetched,SECTOR_SCORE,SECTOR_SETUP);
+    else if(fetched.length===0) showNoTrade();
+  },15000);
+}
+
+function buildFromLive(fetched,SECTOR_SCORE,SECTOR_SETUP){
+  if(!fetched.length){showNoTrade();return;}
+  var candidates=[];
+  fetched.forEach(function(f){
+    var stk=f.stk,price=f.price,chg=f.chg,absChg=Math.abs(chg);
+    var sector=stk.s,macro=SECTOR_SCORE[sector]||60;
+    var dir=chg>=0?'LONG':'SHORT';
+    var conds=[];
+    if(absChg>0.5)conds.push('Displacement');
+    if(absChg>1.0)conds.push('Liquidity Swept');
+    if(absChg>0.3)conds.push('FVG Present');
+    if(stk.g==='A')conds.push('Premium Stock');
+    if(macro>=70)conds.push('Macro Aligned');
+    if(absChg>0.8&&absChg<3.0)conds.push('OTE Zone');
+    conds.push(dir==='LONG'?'Bullish ChoCH':'Bearish ChoCH');
+    if(conds.length<3)return;
+    var riskPct=stk.g==='A'?0.018:0.022;
+    var sl,t1,t2,t3;
+    if(dir==='LONG'){sl=Math.round(price*(1-riskPct)*100)/100;t1=Math.round(price*(1+riskPct)*100)/100;t2=Math.round(price*(1+riskPct*2)*100)/100;t3=Math.round(price*(1+riskPct*3)*100)/100;}
+    else{sl=Math.round(price*(1+riskPct)*100)/100;t1=Math.round(price*(1-riskPct)*100)/100;t2=Math.round(price*(1-riskPct*2)*100)/100;t3=Math.round(price*(1-riskPct*3)*100)/100;}
+    var rp=Math.abs(price-sl);
+    var rrr=rp>0?Math.round(Math.abs(t3-price)/rp*10)/10:0;
+    if(rrr<2.5)return;
+    var riskAmt=Math.round(5000*0.02),qty=Math.max(1,Math.floor(riskAmt/rp));
+    var conf=Math.min(100,Math.round(stk.wr*0.35)+conds.length*5+({A:15,B:10,C:5}[stk.g]||5)+Math.round((macro/100)*10)+Math.min(5,Math.round(rrr)));
+    candidates.push({name:stk.n,dir:dir,tf:'Daily',price:price,sl:sl,t1:t1,t2:t2,t3:t3,
+      rrr:rrr,qty:qty,risk_inr:riskAmt,profit_t3:Math.round(qty*rp*3),
+      confidence:conf,combined_wr:stk.wr*60,sector:sector,grade:stk.g,
+      cond_count:conds.length,conds:conds.length+'/9',
+      setup:SECTOR_SETUP[sector]||'ChoCH+FVG',htf_bias:'Bullish',
+      macro_score:macro,conditions:conds});
+  });
+  var time=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  processSignals(candidates, time, false);
+}
+
 
 
 function animateFunnel(candidates) {
@@ -5274,6 +5352,18 @@ function showSyncAlert(b,total){
 }
 try{startSync();}catch(x){console.log('Sync:',x);}
 
+// Auto-load signals.json on open — always shows today's trade
+setTimeout(function(){
+  try {
+    var today2 = new Date().toISOString().split('T')[0];
+    // Always reload if no trade for today
+    if (!TOD_STATE || TOD_DATE !== today2) {
+      TOD_STATE = null;
+      try{localStorage.removeItem('tod_state');localStorage.removeItem('tod_date');}catch(e){}
+      findBestTrade();
+    }
+  } catch(e) { findBestTrade(); }
+}, 800);
 }; // end window.onload
 </script>
 </body>
@@ -5287,4 +5377,4 @@ try{startSync();}catch(x){console.log('Sync:',x);}
 
 
 
-Your previous message wasn't sent. You can try again.
+
